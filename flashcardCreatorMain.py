@@ -1,4 +1,4 @@
-from borb.pdf import ( # type: ignore
+from borb.pdf import (
     Document,
     Image,
     LayoutElement,
@@ -9,6 +9,7 @@ from borb.pdf import ( # type: ignore
     X11Color,
     HeterogeneousParagraph,
     Paragraph,
+    SimpleFont,
     Chunk,
     TrueTypeFont,
     Font
@@ -16,39 +17,15 @@ from borb.pdf import ( # type: ignore
 import pathlib
 import pandas as pd
 import math
-# import pypdf
-# from pypdf import PdfReader, PdfWriter, Transformation
+from PIL import Image as pillowImage
 
 
-
-
-# n = 3  # number of PDF files
-# pdf_width = 415
-# pdf_height = 321
-
-
-# output = PdfWriter()
-# pdf_summary.add_blank_page(pdf_width * 10, pdf_height * n)
-# for i_pdf in range(n):
-#     source = PdfReader(f'{i_pdf + 1}'.pdf)
-#     for i_page, page in enumerate(pdf_source.pages):
-#         output.pages[0].merge_transformed_page(
-#             page,
-#             Transformation().translate(i_page * pdf_width, (n - i_pdf - 1) * pdf_height),
-#         )
-# output.write('output.pdf')
-# output.close()
-
-
-df = pd.read_csv('database.csv') # type: ignore
+df = pd.read_csv('database.csv')
 d: Document = Document()
 thirdA4: int = int((842/3))
 fromPageEdgeToCardOuterEdgeWidth = int((thirdA4 - 227)/2)
 fromPageEdgeToCardOuterEdgeHeight = int((595-340)/2)
 internalPadding = 15
-
-
-
 
 # Create a TrueTypeFont
 font: Font = TrueTypeFont.from_file("SourceSerif4-VariableFont_opsz,wght.ttf")
@@ -56,7 +33,6 @@ italicFont: Font = TrueTypeFont.from_file("SourceSerif4-Italic-VariableFont_opsz
 
 
 for index, row in df.iterrows():
-
 
     p: Page = Page(595, thirdA4)
     d.append_page(p)
@@ -68,7 +44,11 @@ for index, row in df.iterrows():
     y: int = p.get_size()[1] // 10
     w: int = p.get_size()[0] - 2 * (p.get_size()[0] // 10)
     h: int = p.get_size()[1] - 2 * (p.get_size()[1] // 10)
-
+ 
+    img = pillowImage.open(pathlib.Path("images/back/" + row['imageBack']))
+    img = img.convert("RGBA")
+    img.putalpha(127)  # Half alpha; alpha argument must be an int
+    img.save(pathlib.Path("images/back/" + "transparent" + row['imageBack']))
 
     Image(
             bytes_path_pil_image_or_url=pathlib.Path("images/back/" + row['imageBack']),
@@ -201,5 +181,8 @@ for index, row in df.iterrows():
 
 
     # Write the PDF
-    PDF.write(what=d, where_to="flashcards.pdf")
+
+PDF.write(what=d, where_to="flashcards.pdf")
+
+
 
