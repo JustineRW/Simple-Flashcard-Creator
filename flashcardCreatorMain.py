@@ -9,7 +9,6 @@ from borb.pdf import (
     X11Color,
     HeterogeneousParagraph,
     Paragraph,
-    SimpleFont,
     Chunk,
     TrueTypeFont,
     Font
@@ -17,7 +16,7 @@ from borb.pdf import (
 import pathlib
 import pandas as pd
 import math
-from PIL import Image as pillowImage
+
 
 
 df = pd.read_csv('database.csv')
@@ -31,7 +30,6 @@ internalPadding = 15
 font: Font = TrueTypeFont.from_file("SourceSerif4-VariableFont_opsz,wght.ttf")
 italicFont: Font = TrueTypeFont.from_file("SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
 
-
 for index, row in df.iterrows():
 
     p: Page = Page(595, thirdA4)
@@ -44,11 +42,6 @@ for index, row in df.iterrows():
     y: int = p.get_size()[1] // 10
     w: int = p.get_size()[0] - 2 * (p.get_size()[0] // 10)
     h: int = p.get_size()[1] - 2 * (p.get_size()[1] // 10)
- 
-    img = pillowImage.open(pathlib.Path("images/back/" + row['imageBack']))
-    img = img.convert("RGBA")
-    img.putalpha(127)  # Half alpha; alpha argument must be an int
-    img.save(pathlib.Path("images/back/" + "transparent" + row['imageBack']))
 
     Image(
             bytes_path_pil_image_or_url=pathlib.Path("images/back/" + row['imageBack']),
@@ -65,7 +58,6 @@ for index, row in df.iterrows():
     available_space=(x, y, w, h),
     page=p,
     )
-
 
     l.append_layout_element(
         Paragraph(
