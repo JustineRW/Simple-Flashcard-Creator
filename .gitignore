@@ -1,3 +1,5 @@
 flashcards.pdf
-images/*
+images/front/*
+images/back/*
+images/original/*
 database.csv

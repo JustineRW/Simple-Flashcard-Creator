@@ -16,7 +16,7 @@ from borb.pdf import (
 import pathlib
 import pandas as pd
 import math
-
+import datetime
 
 
 df = pd.read_csv('database.csv')
@@ -35,7 +35,6 @@ for index, row in df.iterrows():
     p: Page = Page(595, thirdA4)
     d.append_page(p)
     l: PageLayout = SingleColumnLayout(p, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
-
 
     # Paint the background on the back of the card
     x: int = p.get_size()[0] // 10
@@ -58,6 +57,16 @@ for index, row in df.iterrows():
     available_space=(x, y, w, h),
     page=p,
     )
+
+    # Image(
+    #         bytes_path_pil_image_or_url=pathlib.Path("images/back/white corner mask"),
+    #         size=(227, 340),
+    #         horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
+    #         vertical_alignment=LayoutElement.VerticalAlignment.MIDDLE,       
+    # ).paint(
+    # available_space=(x, y, w, h),
+    # page=p,
+    # )
 
     l.append_layout_element(
         Paragraph(
@@ -139,7 +148,7 @@ for index, row in df.iterrows():
     quoteAuthorFirstName = Chunk(row['quoteAuthorFirstName'] + " ", font_size=7, font=font)
     quoteAuthorLastName = Chunk( row['quoteAuthorLastName'], font_size=7, font=font)
     quoteYearPublished = Chunk(" ("+ str(row['quoteYearPublished']) + "),", font_size=7, font=font)
-    quotePublicationTitle = Chunk(row['quotePublicationTitle'].capitalize(), font_size=7, font=italicFont)
+    quotePublicationTitle = Chunk(row['quotePublicationTitle'].title(), font_size=7, font=italicFont)
 
 
     l.append_layout_element(

@@ -6,15 +6,21 @@ pdf_width = thirdA4
 pdf_height = 595
 
 pdf_source = PdfReader("flashcards.pdf")
-numberOfPages = len(pdf_source.pages)
+numberOfPagesInSource = len(pdf_source.pages)
+numberOfPagesToAddToOnePageOfOutput = 3
 output = PdfWriter()
-output.add_blank_page(pdf_width * numberOfPages, pdf_height)
 
-for index_pdf in range(numberOfPages):
-    for index_page, page in enumerate(pdf_source.pages):
-        output.pages[0].merge_transformed_page(
-            page,
-            Transformation().translate(index_page * pdf_width, (numberOfPages - index_pdf - 1) * pdf_height),
-        )
-output.write('output.pdf')
+output.add_blank_page(pdf_width * numberOfPagesToAddToOnePageOfOutput, pdf_height)
+outputPageIndex = 0
+
+for i in range(numberOfPagesInSource - numberOfPagesToAddToOnePageOfOutput):
+    for j in range(numberOfPagesToAddToOnePageOfOutput):
+        page = pdf_source.pages[i+j]
+        output.pages[outputPageIndex].merge_transformed_page(page, Transformation().translate(j * pdf_width, 0))
+    outputPageIndex += 1
+    output.add_blank_page(pdf_width * numberOfPagesToAddToOnePageOfOutput, pdf_height)
+    i += 3
+
+    
+output.write('finalFlashcardFileWithMultiplePagesPerPage.pdf')
 output.close()
