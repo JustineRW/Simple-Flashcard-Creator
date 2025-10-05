@@ -11,7 +11,9 @@ from borb.pdf import (
     Paragraph,
     Chunk,
     TrueTypeFont,
-    Font
+    Font,
+    MultiColumnLayout
+
 )
 import pathlib
 import pandas as pd
@@ -20,27 +22,33 @@ import datetime
 
 
 df = pd.read_csv('database.csv')
-d: Document = Document()
-thirdA4: int = int((842/3))
-fromPageEdgeToCardOuterEdgeWidth = int((thirdA4 - 227)/2)
-fromPageEdgeToCardOuterEdgeHeight = int((595-340)/2)
+document: Document = Document()
+pageWidth = 842 #A4 width
+pageHeight = 595 #A4 height
+dividedPage: int = int((pageWidth/3))
+fromPageEdgeToCardOuterEdgeWidth = int((dividedPage - 227)/2)
+fromPageEdgeToCardOuterEdgeHeight = int((pageHeight-340)/2)
 internalPadding = 15
 
 # Create a TrueTypeFont
 font: Font = TrueTypeFont.from_file("SourceSerif4-VariableFont_opsz,wght.ttf")
 italicFont: Font = TrueTypeFont.from_file("SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
 
+refPage = Page(pageHeight, pageWidth)
+refPageLayout: PageLayout = MultiColumnLayout(refPage)
+refPageLayout.append_layout_element(Paragraph("References", font_size=15, font=font))
+
 for index, row in df.iterrows():
 
-    p: Page = Page(595, thirdA4)
-    d.append_page(p)
-    l: PageLayout = SingleColumnLayout(p, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
+    page: Page = Page(pageHeight, dividedPage)
+    document.append_page(page)
+    layout: PageLayout = SingleColumnLayout(page, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
 
     # Paint the background on the back of the card
-    x: int = p.get_size()[0] // 10
-    y: int = p.get_size()[1] // 10
-    w: int = p.get_size()[0] - 2 * (p.get_size()[0] // 10)
-    h: int = p.get_size()[1] - 2 * (p.get_size()[1] // 10)
+    x: int = page.get_size()[0] // 10
+    y: int = page.get_size()[1] // 10
+    w: int = page.get_size()[0] - 2 * (page.get_size()[0] // 10)
+    h: int = page.get_size()[1] - 2 * (page.get_size()[1] // 10)
 
     Image(
             bytes_path_pil_image_or_url=pathlib.Path("images/back/" + row['imageBack']),
@@ -55,7 +63,7 @@ for index, row in df.iterrows():
        
     ).paint(
     available_space=(x, y, w, h),
-    page=p,
+    page=page,
     )
 
     # Image(
@@ -68,7 +76,7 @@ for index, row in df.iterrows():
     # page=p,
     # )
 
-    l.append_layout_element(
+    layout.append_layout_element(
         Paragraph(
             (row['familyName'] + ' (' + row['familyExemplar'] + ' family)').upper(),
             font_color=X11Color.BLACK,
@@ -84,7 +92,7 @@ for index, row in df.iterrows():
     speciesNameOrPlural = "spp." if math.isnan(row['species']) else row['species']
 
 
-    l.append_layout_element(
+    layout.append_layout_element(
         Paragraph(
             row['genus'] + ' ' + speciesNameOrPlural,
             font_color=X11Color.BLACK,
@@ -101,7 +109,7 @@ for index, row in df.iterrows():
     # need to test with lack of example species
     if row['exampleSpecies']:
         exampleSpeciesNames = "(e.g. " + "".join(list(row['exampleSpecies'])) + ")"
-        l.append_layout_element (  
+        layout.append_layout_element (  
             Paragraph(
             exampleSpeciesNames,
             font_color=X11Color.BLACK,
@@ -113,7 +121,7 @@ for index, row in df.iterrows():
         ))
        
     commonNames = "".join(list(row['commonNames']))
-    l.append_layout_element(
+    layout.append_layout_element(
         Paragraph(
             commonNames,
             font_color=X11Color.BLACK,
@@ -133,13 +141,11 @@ for index, row in df.iterrows():
     quoteTextPart2 = Chunk(row['quote'], font=font, font_color=X11Color.BLACK, font_size = 8)
 
 
-    l.append_layout_element(
+    layout.append_layout_element(
         HeterogeneousParagraph([quoteOpenAndClosingQuote, quoteTextPart2,quoteOpenAndClosingQuote],
             text_alignment=LayoutElement.TextAlignment.LEFT,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
             padding_bottom=2,padding_left= internalPadding,padding_right = internalPadding,padding_top=0
-
-
         )
     )
 
@@ -151,22 +157,20 @@ for index, row in df.iterrows():
     quotePublicationTitle = Chunk(row['quotePublicationTitle'].title(), font_size=7, font=italicFont)
 
 
-    l.append_layout_element(
+    layout.append_layout_element(
         HeterogeneousParagraph([quoteAuthorFirstName, quoteAuthorLastName, quoteYearPublished, quotePublicationTitle],
             text_alignment=LayoutElement.TextAlignment.LEFT,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
             padding_bottom=2,padding_left= internalPadding,padding_right = internalPadding,padding_top=0
-
-
         )
     )
 
 
-    l.next_page()
+    layout.next_page()
 
 
     # Front
-    l.append_layout_element(
+    layout.append_layout_element(
         Image(
             bytes_path_pil_image_or_url=pathlib.Path("images/front/" + row['imageFront']),
             size=(227, 340),
@@ -180,10 +184,25 @@ for index, row in df.iterrows():
         )
     )
 
+    # TODO break this into a separate function
+    refPageLayout.append_layout_element(Paragraph("Text:", font_size=7, font=font))
 
-    # Write the PDF
+    refPageLayout.append_layout_element(
+        HeterogeneousParagraph([quoteAuthorLastName, quoteAuthorFirstName, quoteYearPublished, quotePublicationTitle],
+            text_alignment=LayoutElement.TextAlignment.LEFT,
+            horizontal_alignment=LayoutElement.HorizontalAlignment.LEFT,
+        )
+    )
+    refPageLayout.append_layout_element(Paragraph(row['quoteFullReference'], font_size=7, font=font))
+    refPageLayout.append_layout_element(Paragraph("Front Image:", font_size=7, font=font))
+    refPageLayout.append_layout_element(Paragraph(row['frontImageReference'], font_size=7, font=font))
+    refPageLayout.append_layout_element(Paragraph("Back Image:", font_size=7, font=font))
+    refPageLayout.append_layout_element(Paragraph(row['backImageReference'], font_size=7, font=font))
 
-PDF.write(what=d, where_to="flashcards.pdf")
+# Write the PDF
+document.append_page(refPage)
+
+PDF.write(what=document, where_to="flashcards.pdf")
 
 
 

@@ -1,5 +1,6 @@
 flashcards.pdf
 images/front/*
 images/back/*
-images/original/*
+images/originals/*
 database.csv
+finalFlashcardFileWithMultiplePagesPerPage.pdf
