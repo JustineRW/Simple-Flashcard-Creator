@@ -1,6 +1,5 @@
-flashcards.pdf
 images/front/*
 images/back/*
 images/originals/*
 database.csv
-finalFlashcardFileWithMultiplePagesPerPage.pdf
+output/*

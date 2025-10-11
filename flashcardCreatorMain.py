@@ -184,25 +184,7 @@ for index, row in df.iterrows():
         )
     )
 
-    # TODO break this into a separate function
-    refPageLayout.append_layout_element(Paragraph("Text:", font_size=7, font=font))
-
-    refPageLayout.append_layout_element(
-        HeterogeneousParagraph([quoteAuthorLastName, quoteAuthorFirstName, quoteYearPublished, quotePublicationTitle],
-            text_alignment=LayoutElement.TextAlignment.LEFT,
-            horizontal_alignment=LayoutElement.HorizontalAlignment.LEFT,
-        )
-    )
-    refPageLayout.append_layout_element(Paragraph(row['quoteFullReference'], font_size=7, font=font))
-    refPageLayout.append_layout_element(Paragraph("Front Image:", font_size=7, font=font))
-    refPageLayout.append_layout_element(Paragraph(row['frontImageReference'], font_size=7, font=font))
-    refPageLayout.append_layout_element(Paragraph("Back Image:", font_size=7, font=font))
-    refPageLayout.append_layout_element(Paragraph(row['backImageReference'], font_size=7, font=font))
-
-# Write the PDF
-document.append_page(refPage)
-
-PDF.write(what=document, where_to="flashcards.pdf")
+PDF.write(what=document, where_to="output/flashcards.pdf")
 
 
 
