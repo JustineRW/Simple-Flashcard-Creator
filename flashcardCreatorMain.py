@@ -79,7 +79,7 @@ for index, row in df.iterrows():
     )
 
 
-    speciesNameOrPlural = "spp." if math.isnan(row['species']) else row['species']
+    speciesNameOrPlural = row['species'] if isinstance(row['species'], str) else 'spp.' #empty species cell indicates we just want to use the genus name
 
 
     layout.append_layout_element(
@@ -96,8 +96,7 @@ for index, row in df.iterrows():
 
 
 # TODO write a function for reducing each genus name to just the first letter e.g. M. instead of Morus
-    # need to test with lack of example species
-    if row['exampleSpecies']:
+    if isinstance(row['exampleSpecies'],str):
         exampleSpeciesNames = "(e.g. " + "".join(list(row['exampleSpecies'])) + ")"
         layout.append_layout_element (  
             Paragraph(
@@ -174,7 +173,7 @@ for index, row in df.iterrows():
         )
     )
 
-PDF.write(what=document, where_to="output/flashcards.pdf")
+PDF.write(what=document, where_to="output/flashcards" + datetime.datetime.now().strftime("%H%M%S") + ".pdf")
 
 
 
