@@ -40,41 +40,31 @@ refPageLayout.append_layout_element(Paragraph("References", font_size=15, font=f
 
 for index, row in df.iterrows():
 
-    page: Page = Page(pageHeight, dividedPage)
-    document.append_page(page)
-    layout: PageLayout = SingleColumnLayout(page, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
+    currentPage: Page = Page(pageHeight, dividedPage)
+    document.append_page(currentPage)
+    layout: PageLayout = SingleColumnLayout(currentPage, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
 
     # Paint the background on the back of the card
-    x: int = page.get_size()[0] // 10
-    y: int = page.get_size()[1] // 10
-    w: int = page.get_size()[0] - 2 * (page.get_size()[0] // 10)
-    h: int = page.get_size()[1] - 2 * (page.get_size()[1] // 10)
+    x: int = currentPage.get_size()[0] // 10
+    y: int = currentPage.get_size()[1] // 10
+    w: int = currentPage.get_size()[0] - 2 * (currentPage.get_size()[0] // 10)
+    h: int = currentPage.get_size()[1] - 2 * (currentPage.get_size()[1] // 10)
 
     Image(
             bytes_path_pil_image_or_url=pathlib.Path("images/back/" + row['imageBack']),
             size=(227, 340),
-            border_width_top=2,
-            border_width_right=2,
-            border_width_bottom=2,
-            border_width_left=2,
+            border_width_top=1,
+            border_width_right=1,
+            border_width_bottom=1,
+            border_width_left=1,
             border_color=X11Color.LIGHT_GRAY,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
             vertical_alignment=LayoutElement.VerticalAlignment.MIDDLE,
        
     ).paint(
     available_space=(x, y, w, h),
-    page=page,
+    page=currentPage,
     )
-
-    # Image(
-    #         bytes_path_pil_image_or_url=pathlib.Path("images/back/white corner mask"),
-    #         size=(227, 340),
-    #         horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
-    #         vertical_alignment=LayoutElement.VerticalAlignment.MIDDLE,       
-    # ).paint(
-    # available_space=(x, y, w, h),
-    # page=p,
-    # )
 
     layout.append_layout_element(
         Paragraph(
@@ -174,10 +164,10 @@ for index, row in df.iterrows():
         Image(
             bytes_path_pil_image_or_url=pathlib.Path("images/front/" + row['imageFront']),
             size=(227, 340),
-            border_width_top=2,
-            border_width_right=2,
-            border_width_bottom=2,
-            border_width_left=2,
+            border_width_top=1,
+            border_width_right=1,
+            border_width_bottom=1,
+            border_width_left=1,
             border_color=X11Color.LIGHT_GRAY,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
             vertical_alignment=LayoutElement.VerticalAlignment.MIDDLE,
