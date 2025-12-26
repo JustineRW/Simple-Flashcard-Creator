@@ -8,16 +8,15 @@ from borb.pdf import (
     Chunk,
     TrueTypeFont,
     Font,
-    MultiColumnLayout
+    SingleColumnLayout
 
 )
-import pathlib
 import pandas as pd
 
 # TODO make this into a function and pass in the variables
 
-font: Font = TrueTypeFont.from_file("SourceSerif4-VariableFont_opsz,wght.ttf")
-italicFont: Font = TrueTypeFont.from_file("SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
+font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")
+italicFont: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
 
 pageWidth = 842 #A4 width
 pageHeight = 595 #A4 height
@@ -26,7 +25,7 @@ df = pd.read_csv('database.csv')
 document: Document = Document()
 
 refPage = Page(pageHeight, pageWidth)
-refPageLayout: PageLayout = MultiColumnLayout(refPage)
+refPageLayout: PageLayout = SingleColumnLayout(refPage)
 refPageLayout.append_layout_element(Paragraph("References", font_size=15, font=font))
 
 for index, row in df.iterrows():
