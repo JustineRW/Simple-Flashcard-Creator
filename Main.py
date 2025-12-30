@@ -13,10 +13,11 @@ from borb.pdf import (
 )
 import pandas as pd
 
+from addReferencePage import add_reference_pages
 from giveImagesRoundedCorners import give_image_rounded_corners
-from flashcardCreator import createFlashcards
+from flashcardCreator import create_flashcards
 from makeImagesTransparent import make_images_transparent
-from transformPdfIntoPagesPerPage import transformPdfIntoMultiplePages
+from transformPdfIntoPagesPerPage import transform_pdf_into_multiple_pages
 
 font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")
 italicFont: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
@@ -37,6 +38,6 @@ for index, row in df.iterrows():
     give_image_rounded_corners(filepathFront, filepathOriginalImages, cornerMaskFilepath, row['imageFront'])
     make_images_transparent(filepathBack, row['imageBack'], 75) # approx quarter alpha (255 is no transparency at all, 0 is fully transparent)
 
-fullOutputFilePath : str = createFlashcards(df, font, italicFont, pageWidth, pageHeight, outputFileName)
-transformPdfIntoMultiplePages(pagesPerPage, fullOutputFilePath)
-# addReferencePage(font, italicFont)
+fullOutputFilePath : str = create_flashcards(df, font, italicFont, pageWidth, pageHeight, outputFileName)
+transform_pdf_into_multiple_pages(pagesPerPage, fullOutputFilePath)
+add_reference_pages(font, italicFont, pageWidth, pageHeight, df)

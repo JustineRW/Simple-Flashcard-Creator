@@ -20,7 +20,7 @@ import pandas as pd
 import math
 import datetime
 
-def createFlashcards(df: pd.DataFrame, font: Font, italicFont: Font, pageWidth: int, pageHeight: int, fullOutputFilePath: str):
+def create_flashcards(df: pd.DataFrame, font: Font, italicFont: Font, pageWidth: int, pageHeight: int, fullOutputFilePath: str):
     
     document: Document = Document()
     dividedPage: int = int((pageWidth/3))
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     italicFont: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
     pageWidth = 842 #A4 width
     pageHeight = 595 #A4 height
-    createFlashcards(df, font, italicFont, pageWidth, pageHeight, outputFileName)
+    create_flashcards(df, font, italicFont, pageWidth, pageHeight, outputFileName)
 
 
 

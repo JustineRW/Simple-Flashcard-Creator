@@ -1,7 +1,7 @@
 from pypdf import PdfReader, PdfWriter, Transformation
 import datetime
 
-def transformPdfIntoMultiplePages(pagesPerPage : int, fullOutputFilePath : str):
+def transform_pdf_into_multiple_pages(pagesPerPage : int, fullOutputFilePath : str):
     pdf_source = PdfReader(fullOutputFilePath)
     numberOfPagesInSource = len(pdf_source.pages)
 
@@ -50,5 +50,5 @@ def transformPdfIntoMultiplePages(pagesPerPage : int, fullOutputFilePath : str):
     output.close()
 
 if __name__ == "__main__":
-    transformPdfIntoMultiplePages(5, "output\\flashcards160758.pdf")
+    transform_pdf_into_multiple_pages(3, "output\\[add file name here]")
 
