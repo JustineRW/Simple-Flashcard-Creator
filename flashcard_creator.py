@@ -13,23 +13,21 @@ from borb.pdf import (
     TrueTypeFont,
     Font,
     MultiColumnLayout
-
 )
 import pathlib
 import pandas as pd
-import math
 import datetime
 
 from text_helper import clean_text, get_species_full_name
 
-def create_flashcards(df: pd.DataFrame, font: Font, italicFont: Font, pageWidth: int, pageHeight: int, full_output_file_path: str):
+def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth: int, pageHeight: int, full_output_file_path: str):
     
     document: Document = Document()
     dividedPage: int = int((pageWidth/3))
     fromPageEdgeToCardOuterEdgeWidth = int((dividedPage - 227)/2)
     fromPageEdgeToCardOuterEdgeHeight = int((pageHeight-340)/2)
     internal_padding = 22
-    bottomPadding = 1     
+    bottom_padding = 1     
     print("Creating cards.")
     
     for index, row in df.iterrows():
@@ -38,12 +36,12 @@ def create_flashcards(df: pd.DataFrame, font: Font, italicFont: Font, pageWidth:
         layout: PageLayout = SingleColumnLayout(currentPage, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
 
         currentPage = paint_background_image(row, currentPage)
-        layout = add_family_name(internal_padding, font, row, layout, bottomPadding)
-        layout = add_species_full_name(internal_padding, italicFont, row, layout, bottomPadding)
-        layout = add_examples(internal_padding, italicFont, row, layout, bottomPadding)       
-        layout = add_common_names(internal_padding, font, row, layout, bottomPadding)
-        layout = add_quote(internal_padding, font, row, layout, bottomPadding)
-        layout = add_short_reference(internal_padding, font, italicFont, row, layout, bottomPadding)
+        layout = add_family_name(internal_padding, font, row, layout, bottom_padding, 12)
+        layout = add_species_full_name(internal_padding, italic_font, row, layout, bottom_padding, 17)
+        layout = add_examples(internal_padding, italic_font, row, layout, bottom_padding, 10)       
+        layout = add_common_names(internal_padding, font, row, layout, bottom_padding, 11)
+        layout = add_quote(internal_padding, font, row, layout, bottom_padding, 8)
+        layout = add_short_reference(internal_padding, font, italic_font, row, layout, bottom_padding, 7)
         layout.next_page()
         layout = add_front_image(row, layout)
 
@@ -95,25 +93,25 @@ def add_front_image(row, layout):
     return layout
     
 
-def add_short_reference(internal_padding, font, italicFont, row, layout, bottomPadding):
-    quoteAuthorFirstName = Chunk(clean_text(row['quoteAuthorFirstName']) + " ", font_size=7, font=font)
-    quoteAuthorLastName = Chunk( clean_text(row['quoteAuthorLastName']), font_size=7, font=font)
-    quoteYearPublished = Chunk(" ("+ clean_text(str(row['quoteYearPublished'])) + "), ", font_size=7, font=font)
-    quotePublicationTitle = Chunk(clean_text(row['quotePublicationTitle']).title(), font_size=7, font=italicFont)
+def add_short_reference(internal_padding, font, italic_font, row, layout, bottom_padding, font_size):
+    quoteAuthorFirstName = Chunk(clean_text(row['quoteAuthorFirstName']) + " ", font_size=font_size, font=font)
+    quoteAuthorLastName = Chunk( clean_text(row['quoteAuthorLastName']), font_size=font_size, font=font)
+    quoteYearPublished = Chunk(" ("+ clean_text(str(row['quoteYearPublished'])) + "), ", font_size=font_size, font=font)
+    quotePublicationTitle = Chunk(clean_text(row['quotePublicationTitle']).title(), font_size=font_size, font=italic_font)
 
     layout.append_layout_element(
         HeterogeneousParagraph([quoteAuthorFirstName, quoteAuthorLastName, quoteYearPublished, quotePublicationTitle],
             text_alignment=LayoutElement.TextAlignment.LEFT,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
-            padding_bottom=bottomPadding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
+            padding_bottom=bottom_padding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
         )
     )
     return layout
 
-def add_quote(internal_padding, font, row, layout, bottomPadding):
+def add_quote(internal_padding, font, row, layout, bottomPadding, font_size):
     # TODO write a function for splitting quotes so that species names are correctly italised
-    open_and_closing_quote_mark = Chunk('"', font=font, font_size=8)
-    quote = Chunk(clean_text(row['quote']), font=font, font_color=X11Color.BLACK, font_size = 8)
+    open_and_closing_quote_mark = Chunk('"', font=font, font_size= font_size)
+    quote = Chunk(clean_text(row['quote']), font=font, font_color=X11Color.BLACK, font_size = font_size)
 
     layout.append_layout_element(
         HeterogeneousParagraph([open_and_closing_quote_mark, quote,open_and_closing_quote_mark],
@@ -124,7 +122,7 @@ def add_quote(internal_padding, font, row, layout, bottomPadding):
     )
     return layout
 
-def add_common_names(internal_padding, font, row, layout, bottomPadding):
+def add_common_names(internal_padding, font, row, layout, bottomPadding, font_size):
     commonNames = clean_text("".join(list(row['commonNames'])))
     layout.append_layout_element(
         Paragraph(
@@ -133,13 +131,13 @@ def add_common_names(internal_padding, font, row, layout, bottomPadding):
             font=font,
             text_alignment=LayoutElement.TextAlignment.CENTERED,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
-            font_size = 10,
+            font_size = font_size,
             padding_bottom=bottomPadding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
         )
     )
     return layout
 
-def add_examples(internal_padding, italicFont, row, layout, bottomPadding):
+def add_examples(internal_padding, italic_font, row, layout, bottomPadding, font_size):
     # TODO write a function for reducing each genus name to just the first letter e.g. M. instead of Morus
     if isinstance(row['exampleSpecies'],str):
         example_species_names = clean_text("(e.g. " + "".join(list(row['exampleSpecies'])) + ")")
@@ -147,15 +145,15 @@ def add_examples(internal_padding, italicFont, row, layout, bottomPadding):
             Paragraph(
             example_species_names,
             font_color=X11Color.BLACK,
-            font=italicFont,
+            font=italic_font,
             text_alignment=LayoutElement.TextAlignment.CENTERED,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
-            font_size = 7,
+            font_size = font_size,
             padding_bottom=bottomPadding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
         ))
     return layout
 
-def add_species_full_name(internal_padding, italic_font, row, layout, bottom_padding):
+def add_species_full_name(internal_padding, italic_font, row, layout, bottom_padding, font_size):
 
     full_name = get_species_full_name(row['genus'], row['species'])
 
@@ -166,13 +164,13 @@ def add_species_full_name(internal_padding, italic_font, row, layout, bottom_pad
             font=italic_font,
             text_alignment=LayoutElement.TextAlignment.CENTERED,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
-            font_size = 10,
+            font_size = font_size,
             padding_bottom=bottom_padding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
         )
     )
     return layout
 
-def add_family_name(internal_padding, font, row, layout, bottomPadding):
+def add_family_name(internal_padding, font, row, layout, bottomPadding, font_size):
     family_name_and_exemplar = clean_text(row['familyName'] + ' (' + row['familyExemplar'] + ' family)')
       
     layout.append_layout_element(
@@ -182,7 +180,7 @@ def add_family_name(internal_padding, font, row, layout, bottomPadding):
             font=font,
             text_alignment=LayoutElement.TextAlignment.CENTERED,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
-            font_size = 9,
+            font_size = font_size,
             padding_bottom=bottomPadding,padding_left= internal_padding,padding_right = internal_padding,padding_top=30
         )
     )
@@ -195,10 +193,10 @@ if __name__ == "__main__":
     outputFileName = "flashcards"
     # Create a TrueTypeFont
     font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")
-    italicFont: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
+    italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
     pageWidth = 842 #A4 width
     pageHeight = 595 #A4 height
-    create_flashcards(df, font, italicFont, pageWidth, pageHeight, outputFileName)
+    create_flashcards(df, font, italic_font, pageWidth, pageHeight, outputFileName)
 
 
 
