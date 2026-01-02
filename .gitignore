@@ -1,5 +1,2 @@
-images/front/*
-images/back/*
-images/originals/*
 output/*
 /__pycache__/* 

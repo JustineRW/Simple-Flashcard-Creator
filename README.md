@@ -13,6 +13,6 @@ The code handles up to three flashcards per A4 page. More than three flashcards 
 5. Run `main.py`. This will take a few moments. The terminal will print logs.
 6. Flashcards will be provided in a 'final flashcard file' pdf in the `/output` folder. References will be provided in the `references.pdf`. Please note that the reference code is very simple and doesn't follow any specific reference guidelines.
 
-<h3>Acknowledgements</h3>
-Thanks to [borb](https://github.com/borb-pdf), for providing a simple pdf creator with [great documentation](https://github.com/borb-pdf/borb-examples/tree/master/01). And a big thanks to the Biodiversity Heritage Library for the digitised books used to create the example database (note references for individual books and images are recorded in the example database).
+<h2>Acknowledgements</h2>
+Thanks to [borb](https://github.com/borb-pdf) for providing a simple pdf creator with [great documentation](https://github.com/borb-pdf/borb-examples/tree/master/01). And a big thanks to the Biodiversity Heritage Library for the digitised books used to create the example database (note references for individual books and images are recorded in the example database).
 <!-- Add ack for the fonts -->
