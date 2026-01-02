@@ -24,7 +24,7 @@ font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.
 italicFont: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
 print("Fonts loaded.")
 
-df = pd.read_csv('database.csv')
+df = pd.read_csv('example_database.csv')
 filepathBack = "images/back/"
 filepathFront = "images/front/"
 filepathOriginalImages = "images/originals/"

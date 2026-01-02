@@ -191,7 +191,7 @@ def add_family_name(internal_padding, font, row, layout, bottomPadding):
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('database.csv')
+    df = pd.read_csv('example_database.csv')
     outputFileName = "flashcards"
     # Create a TrueTypeFont
     font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")

@@ -26,7 +26,13 @@ def make_images_transparent(filePath, imageName, alpha : int):
 
 
 if __name__ == "main":
-    df = pd.read_csv('database.csv')
-    filePath = "images/back/"
+    df = pd.read_csv('example_database.csv')
+    filepathBack = "images/back/"
+    filepathFront = "images/front/"
+    filepathOriginalImages = "images/originals/"
+    rounded_corners_filepath = "images/originals/cornermask.png"
+
     for index, row in df.iterrows():
-        make_images_transparent(filePath, row['imageBack'], 63) # quarter alpha (255 is no transparency)
+        give_image_rounded_corners(filepathBack, filepathOriginalImages, rounded_corners_filepath, row['imageBack'])
+        give_image_rounded_corners(filepathFront, filepathOriginalImages, rounded_corners_filepath, row['imageFront'])
+        make_images_transparent(filepathBack, row['imageBack'], 63) # quarter alpha (255 is no transparency)

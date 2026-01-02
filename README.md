@@ -7,10 +7,11 @@ The code handles up to three flashcards per A4 page. More than three flashcards 
 <h2>Set-up instructions</h2>
 
 1. In the terminal, run  `pip install -r requirements.txt`
-2. Add your data to the database.csv file, following the named columns. Please refer to the example database.
-3. Add all named image files to the `/originals` folder. Make sure the names for these files match the names you've indicated for the front and back images in the database 
-4. Run `main.py`. This will take a few moments.
-5. Flashcards will be provided in a 'final flashcard file' pdf in the `/output` folder. References will be provided in the `references.pdf`. Please note that the reference code is very simple and doesn't follow any specific reference guidelines.
+2. Add your data to a database.csv file, following the named columns in the example database. Please refer to the example database. If you make changes to the columns, please make sure to update the corresponding references in the flashcard creator file.
+3. Add all named image files to the `/originals` folder. Make sure the names for these files match the names you've indicated for the front and back images in the database.
+4. Update all references to `example_database.csv` to your database.csv name.
+5. Run `main.py`. This will take a few moments. The terminal will print logs.
+6. Flashcards will be provided in a 'final flashcard file' pdf in the `/output` folder. References will be provided in the `references.pdf`. Please note that the reference code is very simple and doesn't follow any specific reference guidelines.
 
 <h3>Acknowledgements</h3>
 Thanks to [borb](https://github.com/borb-pdf), for providing a simple pdf creator with [great documentation](https://github.com/borb-pdf/borb-examples/tree/master/01). And a big thanks to the Biodiversity Heritage Library for the digitised books used to create the example database (note references for individual books and images are recorded in the example database).

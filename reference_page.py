@@ -53,6 +53,6 @@ if __name__ == "__main__":
     pageWidth = 842 #A4 width
     pageHeight = 595 #A4 height
 
-    df = pd.read_csv('database.csv')
+    df = pd.read_csv('example_database.csv')
 
     add_reference_pages(font, italicFont, pageWidth, pageHeight, df)
