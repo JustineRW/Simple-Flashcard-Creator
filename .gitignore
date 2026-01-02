@@ -3,3 +3,4 @@ images/back/*
 images/originals/*
 database.csv
 output/*
+/__pycache__/* 

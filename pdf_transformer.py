@@ -2,8 +2,10 @@ from pypdf import PdfReader, PdfWriter, Transformation
 import datetime
 
 def transform_pdf_into_multiple_pages(pagesPerPage : int, fullOutputFilePath : str):
+    print(f"Reading the one card per page pdf file.")
     pdf_source = PdfReader(fullOutputFilePath)
     numberOfPagesInSource = len(pdf_source.pages)
+    print(f"There are {numberOfPagesInSource} pages in the one card per page pdf file.")
 
     if numberOfPagesInSource % 2 > 0:
         print("Flashcard front and back numbers don't match. Please check the source pdf. There should be an even number of pages (providing fronts and backs for the flashcards)")
@@ -23,8 +25,9 @@ def transform_pdf_into_multiple_pages(pagesPerPage : int, fullOutputFilePath : s
             numberOfPagesInSourceWithPadding += 1
 
     output = PdfWriter()
-    numberOfPagesInOutput = int(numberOfPagesInSource / totalFrontsAndBacksForPagePair)
     outputPageIndex = 0
+
+    print(f"Creating the {pagesPerPage} cards per A4 page pdf file.")
     
     # Put flashcard fronts on one page, and the matching backs on the other page in REVERSE order. This allows double-sided printing by printing with the 'flip on the short side' option
     # Step by the totalFrontsAndBacksForPagePair number (i += totalFrontsAndBacksForPagePair on each loop)
@@ -46,7 +49,9 @@ def transform_pdf_into_multiple_pages(pagesPerPage : int, fullOutputFilePath : s
 
         outputPageIndex += 2
 
-    output.write("output/finalFlashcardFile" + datetime.datetime.now().strftime("%H%M%S") + ".pdf")
+    final_filepath = "output/final_flashcard_file" + "_" + datetime.datetime.now().strftime("%H%M%S") + ".pdf"
+    print(f"Writing the {pagesPerPage} cards per A4 page pdf file to '{final_filepath}'.")
+    output.write(final_filepath)
     output.close()
 
 if __name__ == "__main__":
