@@ -4,6 +4,8 @@ This was a fun personal project using [borb](https://github.com/borb-pdf), a sim
 
 The code handles up to three flashcards per A4 page. More than three flashcards per page and you'll need to adjust the sizes in the `pdf_transformer.pdf` file.
 
+Note: if you encounter any unexpected errors, this can be due to unusual characters in your data. You'll notice that the text helper module contains a clean_text function that strips out ‘ (single quote) characters and replaces them with ' (apostrophe/single quote). The ‘ character was causing odd pdf wrapping failures. Check your data carefully.
+
 <h2>Set-up instructions</h2>
 
 1. In the terminal, run  `pip install -r requirements.txt`
