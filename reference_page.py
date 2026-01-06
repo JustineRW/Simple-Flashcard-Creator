@@ -1,20 +1,17 @@
-from logging import Logger
 from borb.pdf import (
     Document,
     Page,
     PageLayout,
     PDF,
-    HeterogeneousParagraph,
     Paragraph,
-    Chunk,
     TrueTypeFont,
     Font,
     SingleColumnLayout,
-
+    X11Color
 )
 import pandas as pd
 
-from text_helper import clean_text, get_species_full_name
+from text_helper import clean_text, get_species_full_name_or_plural
 
 def add_reference_pages(font, italicFont, pageWidth, pageHeight, df):
     document: Document = Document()
@@ -29,16 +26,16 @@ def add_reference_pages(font, italicFont, pageWidth, pageHeight, df):
 
     for index, row in df.iterrows():
 
-        full_name = get_species_full_name(row['genus'],row['species'])
+        full_name = get_species_full_name_or_plural(row['genus'],row['species'])
         quote_full_reference = clean_text(row['quoteFullReference'])
         front_image_reference = clean_text(row['frontImageReference'])
         back_image_reference = clean_text(row['backImageReference'])
 
-        refPageLayout.append_layout_element(Paragraph(full_name.capitalize() + " Text:", font_size=chosen_font_size, font=italicFont))
+        refPageLayout.append_layout_element(Paragraph(full_name.capitalize() + " Text:", font_size=chosen_font_size, font=italicFont, font_color=X11Color.OLIVE_DRAB))
         refPageLayout.append_layout_element(Paragraph(quote_full_reference, font_size=chosen_font_size, font=font))
-        refPageLayout.append_layout_element(Paragraph(full_name.capitalize() + " Front Image:", font_size=chosen_font_size, font=italicFont))
+        refPageLayout.append_layout_element(Paragraph(full_name.capitalize() + " Front Image:", font_size=chosen_font_size, font=italicFont, font_color=X11Color.OLIVE_DRAB))
         refPageLayout.append_layout_element(Paragraph(front_image_reference, font_size=chosen_font_size, font=font))
-        refPageLayout.append_layout_element(Paragraph(full_name.capitalize() + " Back Image:", font_size=chosen_font_size, font=italicFont, word_spacing=0.5))
+        refPageLayout.append_layout_element(Paragraph(full_name.capitalize() + " Back Image:", font_size=chosen_font_size, font=italicFont, font_color=X11Color.OLIVE_DRAB))
         refPageLayout.append_layout_element(Paragraph(back_image_reference, font_size=chosen_font_size, font=font))
     
     # Write the PDF

@@ -18,37 +18,38 @@ import pathlib
 import pandas as pd
 import datetime
 
-from text_helper import clean_text, get_species_full_name
+from text_helper import clean_text, get_species_full_name_or_plural
 
-def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth: int, pageHeight: int, full_output_file_path: str):
+def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth: int, page_height: int, full_output_file_path: str):
     
     document: Document = Document()
-    dividedPage: int = int((pageWidth/3))
-    fromPageEdgeToCardOuterEdgeWidth = int((dividedPage - 227)/2)
-    fromPageEdgeToCardOuterEdgeHeight = int((pageHeight-340)/2)
+    divided_page: int = int((pageWidth/3))
+    fromPageEdgeToCardOuterEdgeWidth = int((divided_page - 227)/2)
+    fromPageEdgeToCardOuterEdgeHeight = int((page_height-340)/2)
     internal_padding = 22
-    bottom_padding = 1     
+    bottom_padding = 6     
     print("Creating cards.")
     
     for index, row in df.iterrows():
-        currentPage: Page = Page(pageHeight, dividedPage)
-        document.append_page(currentPage)
-        layout: PageLayout = SingleColumnLayout(currentPage, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
+        curren_page: Page = Page(page_height, divided_page)
+        document.append_page(curren_page)
+        layout: PageLayout = SingleColumnLayout(curren_page, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
         table_row_count = 5
 
-        currentPage = paint_background_image(row, currentPage)
+        curren_page = paint_background_image(row, curren_page)
 
         if isinstance(row['exampleSpecies'],str):
             table_row_count = 6
 
-        layout_table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count, border_color=None)
+        layout_table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count)
         layout_table.append_layout_element(add_family_name(internal_padding, font, row, bottom_padding, 11))
-        layout_table.append_layout_element(add_species_full_name(internal_padding, italic_font, row, bottom_padding, 17))
+        layout_table.append_layout_element(add_species_full_name(internal_padding, font, italic_font, row, 2, 17))
         if isinstance(row['exampleSpecies'],str):
-                layout_table.append_layout_element(add_examples(internal_padding, italic_font, row, bottom_padding, 10))       
-        layout_table.append_layout_element(add_common_names(internal_padding, font, row, bottom_padding, 9))
-        layout_table.append_layout_element(add_quote(internal_padding, font, row, bottom_padding, 8))
-        layout_table.append_layout_element(add_short_reference(internal_padding, font, italic_font, row, bottom_padding, 7))
+                layout_table.append_layout_element(add_examples(internal_padding, italic_font, row, 0, 8))       
+        layout_table.append_layout_element(add_common_names(internal_padding, font, row, 8, 8, 11))
+        layout_table.append_layout_element(add_quote(internal_padding, font, row, 0, 8))
+        layout_table.append_layout_element(add_short_reference(internal_padding, font, italic_font, row, 0, 7))
+        layout_table.no_borders()
 
         layout.append_layout_element(layout_table)
         layout.next_page()
@@ -127,7 +128,7 @@ def add_quote(internal_padding, font, row, bottomPadding, font_size):
 
     return paragraph
 
-def add_common_names(internal_padding, font, row, bottomPadding, font_size):
+def add_common_names(internal_padding, font, row, top_padding, bottom_padding, font_size):
     commonNames = clean_text("".join(list(row['commonNames'])))
     paragraph =  Paragraph(
             commonNames,
@@ -136,14 +137,17 @@ def add_common_names(internal_padding, font, row, bottomPadding, font_size):
             text_alignment=LayoutElement.TextAlignment.CENTERED,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
             font_size = font_size,
-            padding_bottom=bottomPadding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
+            padding_bottom=bottom_padding,padding_left= internal_padding,padding_right = internal_padding,padding_top=top_padding
         )
     
     return paragraph
 
 def add_examples(internal_padding, italic_font, row, bottomPadding, font_size):
-    # TODO write a function for reducing each genus name to just the first letter e.g. M. instead of Morus
-    example_species_names = clean_text("(e.g. " + "".join(list(row['exampleSpecies'])) + ")")
+    example_species_list = row['exampleSpecies'].split(",")
+    genus_name = row['genus']
+    shortened_species_list = replace_genus_with_initial(example_species_list, genus_name)
+
+    example_species_names = clean_text("(e.g. " + ", ".join(shortened_species_list) + ")")
     paragraph = Paragraph(
         example_species_names,
         font_color=X11Color.BLACK,
@@ -155,19 +159,36 @@ def add_examples(internal_padding, italic_font, row, bottomPadding, font_size):
     )
     return paragraph
 
-def add_species_full_name(internal_padding, italic_font, row, bottom_padding, font_size):
+def replace_genus_with_initial(example_species_list, genus_name):
+    shortened_species_list = []
+    genus_name = str(genus_name).lower()
 
-    full_name = get_species_full_name(row['genus'], row['species'])
+    for example in example_species_list:
+            example = str(example).lower().strip()
+            full_name : list[str] = example.split(' ')
+            if genus_name in full_name[0]:
+                full_name[0] = full_name[0][:1] + '.'
+            full_name[0] = str(full_name[0]).title()
+            shortened_species_list.append(" ".join(full_name))
 
-    paragraph = Paragraph(
-            full_name,
-            font_color=X11Color.BLACK,
-            font=italic_font,
-            text_alignment=LayoutElement.TextAlignment.CENTERED,
+    return shortened_species_list
+
+def add_species_full_name(internal_padding, font, italic_font, row, bottom_padding, font_size):
+
+    full_name = get_species_full_name_or_plural(row['genus'], row['species'])
+    chunk_list = [Chunk(full_name, font=italic_font, font_color=X11Color.BLACK, font_size = font_size)]
+    full_name_list = full_name.split(' ')
+
+    if full_name_list[1] == 'spp.':
+        genus = Chunk(full_name_list[0], font=italic_font, font_color=X11Color.BLACK, font_size = font_size)
+        species_plural = Chunk(' spp.', font=font, font_color=X11Color.BLACK, font_size = font_size)
+        chunk_list = [genus, species_plural]
+
+    paragraph = HeterogeneousParagraph(chunk_list,
+            text_alignment=LayoutElement.TextAlignment.LEFT,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
-            font_size = font_size,
-            padding_bottom=bottom_padding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
-        )
+            padding_bottom=bottom_padding, padding_left= internal_padding,padding_right = internal_padding,padding_top=0
+    )
 
     return paragraph
 
