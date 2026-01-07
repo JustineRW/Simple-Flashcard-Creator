@@ -26,8 +26,9 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
     divided_page: int = int((pageWidth/3))
     fromPageEdgeToCardOuterEdgeWidth = int((divided_page - 227)/2)
     fromPageEdgeToCardOuterEdgeHeight = int((page_height-340)/2)
-    internal_padding = 22
-    bottom_padding = 6     
+    internal_padding = 23
+    bottom_padding = 7   
+    top_padding = 33  
     print("Creating cards.")
     
     for index, row in df.iterrows():
@@ -39,16 +40,16 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
         curren_page = paint_background_image(row, curren_page)
 
         if isinstance(row['exampleSpecies'],str):
-            table_row_count = 6
+            table_row_count = table_row_count + 1
 
         layout_table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count)
-        layout_table.append_layout_element(add_family_name(internal_padding, font, row, bottom_padding, 11))
-        layout_table.append_layout_element(add_species_full_name(internal_padding, font, italic_font, row, 2, 17))
+        layout_table.append_layout_element(add_family_name(internal_padding, font, row, top_padding, bottom_padding, 11))
+        layout_table.append_layout_element(add_species_full_name(internal_padding, font, italic_font, row, 3, 17))
         if isinstance(row['exampleSpecies'],str):
                 layout_table.append_layout_element(add_examples(internal_padding, italic_font, row, 0, 8))       
-        layout_table.append_layout_element(add_common_names(internal_padding, font, row, 8, 8, 11))
+        layout_table.append_layout_element(add_common_names(internal_padding, font, row, 9, 12, 13))
         layout_table.append_layout_element(add_quote(internal_padding, font, row, 0, 8))
-        layout_table.append_layout_element(add_short_reference(internal_padding, font, italic_font, row, 0, 7))
+        layout_table.append_layout_element(add_short_reference(internal_padding, font, italic_font, row, 0, 6))
         layout_table.no_borders()
 
         layout.append_layout_element(layout_table)
@@ -118,9 +119,12 @@ def add_short_reference(internal_padding, font, italic_font, row, bottom_padding
 def add_quote(internal_padding, font, row, bottomPadding, font_size):
     # TODO write a function for splitting quotes so that species names are correctly italised
     open_and_closing_quote_mark = Chunk('"', font=font, font_size= font_size)
-    quote = Chunk(clean_text(row['quote']), font=font, font_color=X11Color.BLACK, font_size = font_size)
+    quote = clean_text(row['quote'])
+    if len(quote) > 800: #truncate if too long
+        quote = quote[:800] + "..."
+    quote_chunk = Chunk(quote, font=font, font_color=X11Color.BLACK, font_size = font_size)
 
-    paragraph = HeterogeneousParagraph([open_and_closing_quote_mark, quote,open_and_closing_quote_mark],
+    paragraph = HeterogeneousParagraph([open_and_closing_quote_mark,quote_chunk,open_and_closing_quote_mark],
             text_alignment=LayoutElement.TextAlignment.LEFT,
             horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
             padding_bottom=bottomPadding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
@@ -192,31 +196,59 @@ def add_species_full_name(internal_padding, font, italic_font, row, bottom_paddi
 
     return paragraph
 
-def add_family_name(internal_padding, font, row, bottomPadding, font_size):
-    family_name_and_exemplar = clean_text(row['familyName'] + ' (' + row['familyExemplar'] + ' family)')
-      
-    paragraph = Paragraph(
-            family_name_and_exemplar.upper(),
-            font_color=X11Color.BLACK,
-            font=font,
-            text_alignment=LayoutElement.TextAlignment.CENTERED,
-            horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
-            font_size = font_size,
-            padding_bottom=bottomPadding,padding_left= internal_padding,padding_right = internal_padding,padding_top=30
-        )  
+def add_family_name(internal_padding, font, row, top_padding, bottom_padding, font_size):
 
-    return paragraph
+    table_row_count = 1
+    table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count)
+    family_name = clean_text(row['familyName']).upper()
+    exemplar = ('(' + clean_text(row['familyExemplar']) + ' family)').upper()
+
+    family_name_and_exemplar = family_name + ' ' + exemplar
+    table.append_layout_element(Paragraph(
+        family_name_and_exemplar,
+        font_color=X11Color.BLACK,
+        font=font,
+        text_alignment=LayoutElement.TextAlignment.CENTERED,
+        horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
+        font_size = font_size,
+        padding_bottom=bottom_padding,padding_left= internal_padding,padding_right = internal_padding,padding_top=top_padding
+    ))
+
+    if len(family_name_and_exemplar) > 26: #put the family example on a new line if it's too long
+        table_row_count = table_row_count + 1
+        table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count)
+        table.append_layout_element(Paragraph(
+        family_name,
+        font_color=X11Color.BLACK,
+        font=font,
+        text_alignment=LayoutElement.TextAlignment.CENTERED,
+        horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
+        font_size = font_size,
+        padding_bottom=3,padding_left= internal_padding,padding_right = internal_padding,padding_top=top_padding
+    ))
+        table.append_layout_element(Paragraph(
+        exemplar,
+        font_color=X11Color.BLACK,
+        font=font,
+        text_alignment=LayoutElement.TextAlignment.CENTERED,
+        horizontal_alignment=LayoutElement.HorizontalAlignment.MIDDLE,
+        font_size = font_size,
+        padding_bottom=bottom_padding,padding_left= internal_padding,padding_right = internal_padding,padding_top=0
+    ))
+
+    table.no_borders()
+    return table
 
 
 if __name__ == "__main__":
     df = pd.read_csv('example_database.csv')
-    outputFileName = "flashcards"
+    output_file_name = "flashcards"
     # Create a TrueTypeFont
-    font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")
-    italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
-    pageWidth = 842 #A4 width
-    pageHeight = 595 #A4 height
-    create_flashcards(df, font, italic_font, pageWidth, pageHeight, outputFileName)
+    font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Light.ttf")
+    italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-LightItalic.ttf")
+    page_width = 842 #A4 width
+    page_height = 595 #A4 height
+    create_flashcards(df, font, italic_font, page_width, page_height, output_file_name)
 
 
 

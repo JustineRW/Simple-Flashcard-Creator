@@ -9,6 +9,7 @@ from borb.pdf import (
     SingleColumnLayout,
     X11Color
 )
+import datetime
 import pandas as pd
 
 from text_helper import clean_text, get_species_full_name_or_plural
@@ -20,7 +21,7 @@ def add_reference_pages(font, italicFont, pageWidth, pageHeight, df):
     refPageLayout: PageLayout = SingleColumnLayout(refPage)
     refPageLayout.append_layout_element(Paragraph("References", font_size=15, font=font))
     chosen_font_size = 10
-    output_file_path = "output/references.pdf"
+    output_file_path = "output/references" + "_" + datetime.datetime.now().strftime("%H%M%S") + ".pdf"
 
     print("Creating reference page.")
 
@@ -44,12 +45,12 @@ def add_reference_pages(font, italicFont, pageWidth, pageHeight, df):
     PDF.write(what=document, where_to=output_file_path)
 
 if __name__ == "__main__":
-    font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")
-    italicFont: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
+    font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Light.ttf")
+    italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-LightItalic.ttf")
 
     pageWidth = 842 #A4 width
     pageHeight = 595 #A4 height
 
     df = pd.read_csv('example_database.csv')
 
-    add_reference_pages(font, italicFont, pageWidth, pageHeight, df)
+    add_reference_pages(font, italic_font, pageWidth, pageHeight, df)
