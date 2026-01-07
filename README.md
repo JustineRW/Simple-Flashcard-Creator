@@ -14,7 +14,7 @@ The code handles up to three flashcards per A4 page. More than three flashcards 
 6. Flashcards will be provided in a 'final flashcard file' pdf in the `/output` folder. References will be provided in the `references.pdf`. Please note that the reference code is very simple and doesn't follow any specific reference guidelines.
 
 <h2>Examples<h2>
-Example output can be found in the output folder. All examples use public domain images and data. The Source Serif 4 font has an open licence (please refer to https://fonts.google.com/specimen/Source+Serif+4/license).
+Run main to see example output (will be placed in the output folder). All examples use public domain images and data. The Source Serif 4 font has an open licence (please refer to https://fonts.google.com/specimen/Source+Serif+4/license).
 
 <h2>Troubleshooting</h2>
 If you encounter any unexpected errors on pdf creation, this can be due to unusual characters in your data. You'll notice that the text helper module contains a clean_text function that strips out ‘ (single quote) characters and replaces them with ' (apostrophe/single quote). The ‘ character was causing odd pdf wrapping failures.

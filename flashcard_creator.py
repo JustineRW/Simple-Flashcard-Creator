@@ -28,7 +28,7 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
     fromPageEdgeToCardOuterEdgeHeight = int((page_height-340)/2)
     internal_padding = 23
     bottom_padding = 7   
-    top_padding = 33  
+    top_padding = 35  
     print("Creating cards.")
     
     for index, row in df.iterrows():
@@ -44,7 +44,7 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
 
         layout_table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count)
         layout_table.append_layout_element(add_family_name(internal_padding, font, row, top_padding, bottom_padding, 11))
-        layout_table.append_layout_element(add_species_full_name(internal_padding, font, italic_font, row, 3, 17))
+        layout_table.append_layout_element(add_species_full_name(internal_padding, font, italic_font, row, 4, 17))
         if isinstance(row['exampleSpecies'],str):
                 layout_table.append_layout_element(add_examples(internal_padding, italic_font, row, 0, 8))       
         layout_table.append_layout_element(add_common_names(internal_padding, font, row, 9, 12, 13))
