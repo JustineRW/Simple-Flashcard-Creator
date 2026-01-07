@@ -2,6 +2,10 @@ This code makes simple flashcards from a `database.csv`, gives each flashcard a 
 
 This was a fun personal project using [borb](https://github.com/borb-pdf), a simple pdf creator. I originally wanted some botanical flashcards, so the example database and a number of the `flashcard_creator.py` functions are set up specifically for botanical data (e.g., they include column headers like 'genus'). You could modify the flashcard creator to make whatever kinds of flashcards you needed :). Refer to the borb documentation for examples of working with borb (https://github.com/borb-pdf/borb-examples/tree/master/01).
 
+<img width="1519" height="568" alt="image" src="https://github.com/user-attachments/assets/2e3c12a3-9515-45c9-812d-fa7b16378c3c" />
+(Example pdf, with three flashcards per page. This .pdf can be printed with the 'flip on short side' printing option. The fronts and backs of the cards align.)
+
+
 The code handles up to three flashcards per A4 page. More than three flashcards per page and you'll need to adjust the sizes in the `pdf_transformer.pdf` file.
 
 <h2>Set-up instructions</h2>
