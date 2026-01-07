@@ -11,8 +11,8 @@ from image_manipulation import make_images_transparent
 from pdf_transformer import transform_pdf_into_multiple_pages
 
 print("Initialising fonts.")
-font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Light.ttf")
-italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-LightItalic.ttf")
+font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")
+italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
 print("Fonts loaded.")
 
 df = pd.read_csv('example_database.csv')

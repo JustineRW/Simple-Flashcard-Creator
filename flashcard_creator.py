@@ -49,7 +49,7 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
                 layout_table.append_layout_element(add_examples(internal_padding, italic_font, row, 0, 8))       
         layout_table.append_layout_element(add_common_names(internal_padding, font, row, 9, 12, 13))
         layout_table.append_layout_element(add_quote(internal_padding, font, row, 0, 8))
-        layout_table.append_layout_element(add_short_reference(internal_padding, font, italic_font, row, 0, 6))
+        layout_table.append_layout_element(add_short_reference(internal_padding, font, italic_font, row, 0, 7))
         layout_table.no_borders()
 
         layout.append_layout_element(layout_table)
@@ -244,8 +244,8 @@ if __name__ == "__main__":
     df = pd.read_csv('example_database.csv')
     output_file_name = "flashcards"
     # Create a TrueTypeFont
-    font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Light.ttf")
-    italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-LightItalic.ttf")
+    font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")
+    italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
     page_width = 842 #A4 width
     page_height = 595 #A4 height
     create_flashcards(df, font, italic_font, page_width, page_height, output_file_name)

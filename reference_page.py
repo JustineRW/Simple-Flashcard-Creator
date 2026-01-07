@@ -45,8 +45,8 @@ def add_reference_pages(font, italicFont, pageWidth, pageHeight, df):
     PDF.write(what=document, where_to=output_file_path)
 
 if __name__ == "__main__":
-    font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Light.ttf")
-    italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-LightItalic.ttf")
+    font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-VariableFont_opsz,wght.ttf")
+    italic_font: Font = TrueTypeFont.from_file("fonts\\SourceSerif4-Italic-VariableFont_opsz,wght.ttf")
 
     pageWidth = 842 #A4 width
     pageHeight = 595 #A4 height
