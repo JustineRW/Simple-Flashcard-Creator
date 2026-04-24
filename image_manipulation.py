@@ -2,27 +2,34 @@ from PIL import Image
 import pathlib
 import pandas as pd
 
-def give_image_rounded_corners(filepath, filepathOriginal, cornerMaskFilepath, imageName):
+def give_image_rounded_corners(new_filepath, original_filepath, corner_mask_filepath, image_name):
 
-    filename = filepathOriginal + imageName
-    image = Image.open(pathlib.Path(filename)) 
-    corner_mask = Image.open(pathlib.Path(cornerMaskFilepath))
+    file_name = original_filepath + image_name
+    try:
+        image = Image.open(pathlib.Path(file_name)) 
+        corner_mask = Image.open(pathlib.Path(corner_mask_filepath))
 
-    image_width, image_height = image.size
-    corner_mask = corner_mask.resize((image_width,image_height))
+        image_width, image_height = image.size
+        corner_mask = corner_mask.resize((image_width,image_height))
 
-    image.paste(corner_mask, (0,0), mask=corner_mask)
-    image.save(pathlib.Path(filepath + imageName))
+        image.paste(corner_mask, (0,0), mask=corner_mask)
+        image.save(pathlib.Path(new_filepath + image_name))
+    except:
+        print(f"Something went wrong with giving the {file_name} image rounded corners. Rounded corners skipped.")
 
-def make_images_transparent(filePath, imageName, alpha : int):
 
-    backImage = Image.open(pathlib.Path(filePath + imageName)) 
-    backImage = backImage.convert("RGBA")
-    backImage.putalpha(alpha)  
+def make_images_transparent(filepath, image_name, alpha : int):
 
-    if imageName.split('.')[1] != 'png':
-        imageName = imageName.split('.')[0] + ".png"
-    backImage.save(pathlib.Path(filePath + imageName))
+    try:
+        back_image = Image.open(pathlib.Path(filepath + image_name)) 
+        back_image = back_image.convert("RGBA")
+        back_image.putalpha(alpha)  
+
+        if image_name.split('.')[1] != 'png':
+            image_name = image_name.split('.')[0] + ".png"
+        back_image.save(pathlib.Path(filepath + image_name))
+    except:
+        print(f"Something went wrong with making the {filepath + image_name} image transparent. A blank page will be used instead of this image in the output pdf. Please check your database.csv and image names and try again.")
 
 
 if __name__ == "main":

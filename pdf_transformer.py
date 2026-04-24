@@ -8,7 +8,7 @@ def transform_pdf_into_multiple_pages(pagesPerPage : int, fullOutputFilePath : s
     print(f"There are {numberOfPagesInSource} pages in the one card per page pdf file.")
 
     if numberOfPagesInSource % 2 > 0:
-        print("Flashcard front and back numbers don't match. Please check the source pdf. There should be an even number of pages (providing fronts and backs for the flashcards)")
+        print("Flashcard front and back numbers don't match. Please check the one-page source pdf. There should be an even number of pages (providing fronts and backs for the flashcards)")
         return 
     
     pagesToAddToOnePageOfOutput = pagesPerPage

@@ -28,9 +28,11 @@ page_height = 595 #A4 height
 
 print(f"Giving images rounded corners and making background images transparent.")
 for index, row in df.iterrows():
-    give_image_rounded_corners(filepath_back, filepath_original_images, rounded_corners_filepath, row['imageBack'])
-    give_image_rounded_corners(filepath_front, filepath_original_images, rounded_corners_filepath, row['imageFront'])
-    make_images_transparent(filepath_back, row['imageBack'], chosen_transparency) 
+    back_image_filename = str(row["imageBack"])
+    front_image_filename = str(row["imageFront"])
+    give_image_rounded_corners(filepath_back, filepath_original_images, rounded_corners_filepath, back_image_filename)
+    give_image_rounded_corners(filepath_front, filepath_original_images, rounded_corners_filepath, front_image_filename)
+    make_images_transparent(filepath_back, back_image_filename, chosen_transparency) 
 
 full_output_filepath : str = create_flashcards(df, font, italic_font, page_width, page_height, one_card_per_page_output_file_name)
 transform_pdf_into_multiple_pages(cards_per_A4_page, full_output_filepath)
