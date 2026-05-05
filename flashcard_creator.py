@@ -67,7 +67,7 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
         front_image = add_front_image(row, image_width, image_height, image_border_colour, image_border_width)
         layout.append_layout_element(front_image)
 
-    full_output_file_path = "output\\" + full_output_file_path + "_" + datetime.datetime.now().strftime("%H%M%S") + ".pdf"
+    full_output_file_path = "output\\" + full_output_file_path + "_" + datetime.datetime.now().strftime("%I%M%S_%p") + ".pdf"
     print(f"Writing cards to one card per page pdf, at '{full_output_file_path}'")
     PDF.write(what=document, where_to=full_output_file_path)
     return full_output_file_path
@@ -80,13 +80,13 @@ def paint_background_image(row, currentPage, image_width, image_height, image_bo
 
     filename_as_png = str(row['imageBack']).split('.')[0] + '.png'
     image_filepath = pathlib.Path("images/back/" + filename_as_png)
-    blank_pil_image = PilImage.new(mode="RGB", size=(image_width, image_height), color = (152, 251, 152))
+    blank_pil_image = PilImage.new(mode="RGB", size=(image_width, image_height), color = (255, 255, 255))
 
     if os.path.isfile(image_filepath):
       image : Image = create_image_with_file_ref(image_filepath, image_width, image_height, image_border_colour, image_border_width)
     else:
         print(f"Background image for {str(row["genus"])} not found. Background will be left blank.")
-        image : Image = create_blank_image(blank_pil_image, image_width, image_height, image_border_colour, image_border_width)
+    image : Image = create_blank_image(blank_pil_image, image_width, image_height, image_border_colour, image_border_width)
 
     image.paint(
         available_space=(x, y, w, h),
@@ -123,7 +123,7 @@ def create_blank_image(pil_image, image_width, image_height, image_border_colour
 
 def add_front_image(row, image_width, image_height, image_border_colour, image_border_width):
     image_filepath = pathlib.Path("images/front/" + str(row['imageFront']))
-    blank_pil_image = PilImage.new(mode="RGB", size=(image_width, image_height), color = (152, 251, 152))
+    blank_pil_image = PilImage.new(mode="RGB", size=(image_width, image_height), color = (255, 255, 255))
     
     if os.path.isfile(image_filepath):
         image : Image = create_image_with_file_ref(image_filepath, image_width, image_height, image_border_colour, image_border_width)
@@ -164,7 +164,7 @@ def add_quote(internal_padding, font, row, bottomPadding, font_size):
     return paragraph
 
 def add_common_names(internal_padding, font, row, top_padding, bottom_padding, font_size):
-    commonNames = clean_text("".join(list(str(row['commonNames']))))
+    commonNames = clean_text("".join(list(str(row['commonNames'])))).capitalize()
     paragraph =  Paragraph(
             commonNames,
             font_color=X11Color.BLACK,
@@ -182,7 +182,7 @@ def add_examples(internal_padding, italic_font, row, bottomPadding, font_size):
     genus_name = str(row['genus'])
     shortened_species_list = replace_genus_with_initial(example_species_list, genus_name)
 
-    example_species_names = clean_text("(e.g. " + ", ".join(shortened_species_list) + ")")
+    example_species_names = clean_text("e.g. " + ", ".join(shortened_species_list))
     paragraph = Paragraph(
         example_species_names,
         font_color=X11Color.BLACK,
@@ -199,9 +199,9 @@ def replace_genus_with_initial(example_species_list, genus_name):
     genus_name = str(genus_name).lower()
 
     for example in example_species_list:
-            example = str(example).lower().strip()
+            example = str(example).strip()
             full_name : list[str] = example.split(' ')
-            if genus_name in full_name[0]:
+            if genus_name in full_name[0].lower():
                 full_name[0] = full_name[0][:1] + '.'
             full_name[0] = str(full_name[0]).title()
             shortened_species_list.append(" ".join(full_name))
@@ -232,9 +232,9 @@ def add_family_name(internal_padding, font, row, top_padding, bottom_padding, fo
     table_row_count = 1
     table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count)
     family_name = clean_text(str(row['familyName'])).upper()
-    exemplar = ('(' + clean_text(str(row['familyExemplar'])) + ' family)').upper()
+    exemplar = clean_text(str(row['familyExemplar']))
 
-    family_name_and_exemplar = family_name + ' ' + exemplar
+    family_name_and_exemplar = family_name + ((' (' + exemplar + ' family)').upper() if exemplar != 'nan' else '')
     table.append_layout_element(Paragraph(
         family_name_and_exemplar,
         font_color=X11Color.BLACK,

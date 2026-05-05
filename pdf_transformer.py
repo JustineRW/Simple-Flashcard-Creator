@@ -49,7 +49,7 @@ def transform_pdf_into_multiple_pages(pagesPerPage : int, fullOutputFilePath : s
 
         outputPageIndex += 2
 
-    final_filepath = "output/final_flashcard_file" + "_" + datetime.datetime.now().strftime("%H%M%S") + ".pdf"
+    final_filepath = "output/final_flashcard_file" + "_" + datetime.datetime.now().strftime("%I%M%S_%p") + ".pdf"
     print(f"Writing the {pagesPerPage} cards per A4 page pdf file to '{final_filepath}'.")
     output.write(final_filepath)
     output.close()

@@ -5,5 +5,5 @@ def clean_text(input_string: str):
 
 def get_species_full_name_or_plural(genus : str, species : str):
     species_name_or_plural = species if species != 'nan' else 'spp.' #NaN species cell indicates we just want to use the genus name
-    full_name = clean_text(genus + ' ' + species_name_or_plural)
+    full_name = clean_text(genus + ' ' + species_name_or_plural).capitalize()
     return full_name
