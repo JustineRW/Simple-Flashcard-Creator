@@ -86,7 +86,7 @@ def paint_background_image(row, currentPage, image_width, image_height, image_bo
       image : Image = create_image_with_file_ref(image_filepath, image_width, image_height, image_border_colour, image_border_width)
     else:
         print(f"Background image for {str(row["genus"])} not found. Background will be left blank.")
-    image : Image = create_blank_image(blank_pil_image, image_width, image_height, image_border_colour, image_border_width)
+        image : Image = create_blank_image(blank_pil_image, image_width, image_height, image_border_colour, image_border_width)
 
     image.paint(
         available_space=(x, y, w, h),
