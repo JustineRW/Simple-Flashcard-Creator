@@ -2,27 +2,51 @@ from PIL import Image
 import pathlib
 import pandas as pd
 
-def give_image_rounded_corners(filepath, filepathOriginal, cornerMaskFilepath, imageName):
+imageSuffixes = ['.tif','.tiff','.jpeg','.jpg','.png','.webp','.gif']
 
-    filename = filepathOriginal + imageName
-    image = Image.open(pathlib.Path(filename)) 
-    corner_mask = Image.open(pathlib.Path(cornerMaskFilepath))
+def give_image_rounded_corners(new_filepath, original_filepath, corner_mask_filepath, image_name: str):
 
-    image_width, image_height = image.size
-    corner_mask = corner_mask.resize((image_width,image_height))
+    image_name = get_image_name_with_suffix(original_filepath, image_name)
+    original_image_file_path = original_filepath + image_name
 
-    image.paste(corner_mask, (0,0), mask=corner_mask)
-    image.save(pathlib.Path(filepath + imageName))
+    try:
+        image = Image.open(pathlib.Path(original_image_file_path)) 
+        corner_mask = Image.open(pathlib.Path(corner_mask_filepath))
 
-def make_images_transparent(filePath, imageName, alpha : int):
+        image_width, image_height = image.size
+        corner_mask = corner_mask.resize((image_width,image_height))
 
-    backImage = Image.open(pathlib.Path(filePath + imageName)) 
-    backImage = backImage.convert("RGBA")
-    backImage.putalpha(alpha)  
+        image.paste(corner_mask, (0,0), mask=corner_mask)
+        image.save(pathlib.Path(new_filepath + image_name))
+    except:
+        if not pathlib.Path(original_image_file_path).exists():
+            print(f"File {original_image_file_path} does not exist.")
+        print(f"Something went wrong with giving the {original_image_file_path} image rounded corners. Rounded corners skipped.")
 
-    if imageName.split('.')[1] != 'png':
-        imageName = imageName.split('.')[0] + ".png"
-    backImage.save(pathlib.Path(filePath + imageName))
+def get_image_name_with_suffix(filepath: str, image_name: str) -> str:
+    if "." in image_name :
+            return image_name
+
+    for suffix in imageSuffixes:
+        if pathlib.Path(filepath + image_name + suffix).exists():
+            return image_name + suffix
+
+    return image_name
+
+
+def make_images_transparent(filepath: str, image_name: str, alpha : int):
+
+    image_name = get_image_name_with_suffix(filepath,image_name)
+    try:
+        back_image = Image.open(pathlib.Path(filepath + image_name)) 
+        back_image = back_image.convert("RGBA")
+        back_image.putalpha(alpha)  
+
+        if image_name.split('.')[1] != 'png':
+            image_name = image_name.split('.')[0] + ".png"
+        back_image.save(pathlib.Path(filepath + image_name))
+    except:
+        print(f"Something went wrong with making the {filepath + image_name} image transparent. A blank page will be used instead of this image in the output pdf. Please check your database.csv and image names and try again.")
 
 
 if __name__ == "main":

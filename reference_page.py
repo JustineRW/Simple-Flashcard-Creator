@@ -27,10 +27,10 @@ def add_reference_pages(font, italicFont, pageWidth, pageHeight, df):
 
     for index, row in df.iterrows():
 
-        full_name = get_species_full_name_or_plural(row['genus'],row['species'])
-        quote_full_reference = clean_text(row['quoteFullReference'])
-        front_image_reference = clean_text(row['frontImageReference'])
-        back_image_reference = clean_text(row['backImageReference'])
+        full_name = get_species_full_name_or_plural(str(row['genus']),str(row['species']))
+        quote_full_reference = clean_text(str(row['quoteFullReference']))
+        front_image_reference = clean_text(str(row['frontImageReference']))
+        back_image_reference = clean_text(str(row['backImageReference']))
 
         refPageLayout.append_layout_element(Paragraph(full_name.capitalize() + " Text:", font_size=chosen_font_size, font=italicFont, font_color=X11Color.OLIVE_DRAB))
         refPageLayout.append_layout_element(Paragraph(quote_full_reference, font_size=chosen_font_size, font=font))
