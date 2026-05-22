@@ -18,8 +18,8 @@ import pathlib
 import pandas as pd
 import datetime
 from PIL import Image as PilImage
-import os.path 
 from text_helper import clean_text, get_species_full_name_or_plural
+from image_manipulation import get_image_name_with_suffix
 
 def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth: int, page_height: int, full_output_file_path: str):
     
@@ -73,20 +73,25 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
     return full_output_file_path
 
 def paint_background_image(row, currentPage, image_width, image_height, image_border_colour, image_border_width):
+    
     x: int = currentPage.get_size()[0] // 10
     y: int = currentPage.get_size()[1] // 10
     w: int = currentPage.get_size()[0] - 2 * (currentPage.get_size()[0] // 10)
     h: int = currentPage.get_size()[1] - 2 * (currentPage.get_size()[1] // 10)
 
-    filename_as_png = str(row['imageBack']).split('.')[0] + '.png'
-    image_filepath = pathlib.Path("images/back/" + filename_as_png)
     blank_pil_image = PilImage.new(mode="RGB", size=(image_width, image_height), color = (255, 255, 255))
+    image : Image = create_blank_image(blank_pil_image, image_width, image_height, image_border_colour, image_border_width)
 
-    if os.path.isfile(image_filepath):
-      image : Image = create_image_with_file_ref(image_filepath, image_width, image_height, image_border_colour, image_border_width)
+    if isinstance(row['imageBack'],str):    
+        filename_as_png = row['imageBack'].split('.')[0] + '.png'
+        image_filepath = pathlib.Path("images/back/" + filename_as_png)
+
+        if pathlib.Path(image_filepath).exists():
+            image : Image = create_image_with_file_ref(image_filepath, image_width, image_height, image_border_colour, image_border_width)
+        else:
+            print(f"Background image for {str(row["genus"])} not found. Background will be left blank.")
     else:
-        print(f"Background image for {str(row["genus"])} not found. Background will be left blank.")
-        image : Image = create_blank_image(blank_pil_image, image_width, image_height, image_border_colour, image_border_width)
+        print(f"No background image name listed for {str(row["genus"])}. Background will be left blank.")
 
     image.paint(
         available_space=(x, y, w, h),
@@ -122,14 +127,17 @@ def create_blank_image(pil_image, image_width, image_height, image_border_colour
         )
 
 def add_front_image(row, image_width, image_height, image_border_colour, image_border_width):
-    image_filepath = pathlib.Path("images/front/" + str(row['imageFront']))
-    blank_pil_image = PilImage.new(mode="RGB", size=(image_width, image_height), color = (255, 255, 255))
     
-    if os.path.isfile(image_filepath):
-        image : Image = create_image_with_file_ref(image_filepath, image_width, image_height, image_border_colour, image_border_width)
-    else:
-        print(f"Front image for {str(row["genus"])} not found. Front image will be left blank.")
-        image : Image = create_blank_image(blank_pil_image, image_width, image_height, image_border_colour, image_border_width)
+    blank_pil_image = PilImage.new(mode="RGB", size=(image_width, image_height), color = (255, 255, 255))
+    image : Image = create_blank_image(blank_pil_image, image_width, image_height, image_border_colour, image_border_width)
+    
+    if isinstance(row['imageFront'],str):
+        image_filepath = pathlib.Path("images/front/" + get_image_name_with_suffix("images/front/", row['imageFront']))
+        
+        if pathlib.Path(image_filepath).exists():
+            image : Image = create_image_with_file_ref(image_filepath, image_width, image_height, image_border_colour, image_border_width)
+        else:
+            print(f"Front image for {str(row["genus"])} not found. Front image will be left blank.")
 
     return image        
 
