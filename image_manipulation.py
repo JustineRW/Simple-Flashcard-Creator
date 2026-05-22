@@ -2,9 +2,12 @@ from PIL import Image
 import pathlib
 import pandas as pd
 
+imageSuffixes = ['tif','jpeg','jpg','png','webp','gif']
+
 def give_image_rounded_corners(new_filepath, original_filepath, corner_mask_filepath, image_name):
 
-    file_name = original_filepath + image_name
+    file_name = getFileNameWithSuffix(original_filepath, image_name)
+
     try:
         image = Image.open(pathlib.Path(file_name)) 
         corner_mask = Image.open(pathlib.Path(corner_mask_filepath))
@@ -17,19 +20,31 @@ def give_image_rounded_corners(new_filepath, original_filepath, corner_mask_file
     except:
         print(f"Something went wrong with giving the {file_name} image rounded corners. Rounded corners skipped.")
 
+def getFileNameWithSuffix(original_filepath, image_name) -> str:
+    if "." in image_name :
+            return original_filepath + image_name
+
+    file_name = original_filepath + image_name
+    for suffix in imageSuffixes:
+        if pathlib.Path(file_name + suffix).exists():
+            file_name += suffix
+
+    return file_name
+
 
 def make_images_transparent(filepath, image_name, alpha : int):
 
+    full_file_name = getFileNameWithSuffix(filepath, image_name)
     try:
-        back_image = Image.open(pathlib.Path(filepath + image_name)) 
+        back_image = Image.open(pathlib.Path(full_file_name)) 
         back_image = back_image.convert("RGBA")
         back_image.putalpha(alpha)  
 
         if image_name.split('.')[1] != 'png':
             image_name = image_name.split('.')[0] + ".png"
-        back_image.save(pathlib.Path(filepath + image_name))
+        back_image.save(pathlib.Path(full_file_name))
     except:
-        print(f"Something went wrong with making the {filepath + image_name} image transparent. A blank page will be used instead of this image in the output pdf. Please check your database.csv and image names and try again.")
+        print(f"Something went wrong with making the {full_file_name} image transparent. A blank page will be used instead of this image in the output pdf. Please check your database.csv and image names and try again.")
 
 
 if __name__ == "main":

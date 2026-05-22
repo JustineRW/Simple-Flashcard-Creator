@@ -233,8 +233,9 @@ def add_family_name(internal_padding, font, row, top_padding, bottom_padding, fo
     table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count)
     family_name = clean_text(str(row['familyName'])).upper()
     exemplar = clean_text(str(row['familyExemplar']))
+    exemplar = ((' (' + exemplar + ' family)').upper() if exemplar != 'nan' else '')
 
-    family_name_and_exemplar = family_name + ((' (' + exemplar + ' family)').upper() if exemplar != 'nan' else '')
+    family_name_and_exemplar = family_name + exemplar
     table.append_layout_element(Paragraph(
         family_name_and_exemplar,
         font_color=X11Color.BLACK,
