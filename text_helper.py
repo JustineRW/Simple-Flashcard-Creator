@@ -1,6 +1,6 @@
 
 def clean_text(input_string: str):
-    cleaned_input : str = str.replace(input_string,"‘","'")
+    cleaned_input : str = str.replace(input_string,"‘","'").replace("”","\"").strip()
     return cleaned_input
 
 def get_species_full_name_or_plural(genus : str, species : str):

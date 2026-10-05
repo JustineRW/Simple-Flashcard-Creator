@@ -1,8 +1,9 @@
-from PIL import Image 
+from PIL import Image, ImageFile 
 import pathlib
 import pandas as pd
 
 imageSuffixes = ['.tif','.tiff','.jpeg','.jpg','.png','.webp','.gif']
+overlay_image_filepath = 'images\back\background_image.jpg'
 
 def give_image_rounded_corners(new_filepath, original_filepath, corner_mask_filepath, image_name: str):
 
@@ -22,6 +23,31 @@ def give_image_rounded_corners(new_filepath, original_filepath, corner_mask_file
         if not pathlib.Path(original_image_file_path).exists():
             print(f"File {original_image_file_path} does not exist.")
         print(f"Something went wrong with giving the {original_image_file_path} image rounded corners. Rounded corners skipped.")
+
+def add_overlay(new_filepath, original_filepath, overlay_image_filepath : str, image_name: str, alpha : int):
+        
+    image_name = get_image_name_with_suffix(original_filepath, image_name)
+    original_image_file_path = original_filepath + image_name
+
+    try:
+        image = Image.open(pathlib.Path(original_image_file_path)) 
+        overlay_image = Image.open(pathlib.Path(overlay_image_filepath))
+
+        image_width, image_height = image.size
+        overlay_image = overlay_image.resize((image_width,image_height))        
+        overlay_image = overlay_image.convert("RGBA")
+        overlay_image.putalpha(alpha)  
+
+        image.paste(overlay_image, (0,0), mask=overlay_image)
+        
+        if image_name.split('.')[1] != 'png':
+            image_name = image_name.split('.')[0] + ".png"
+        image.save(pathlib.Path(new_filepath + image_name))
+    except:
+        if not pathlib.Path(original_image_file_path).exists():
+            print(f"File {original_image_file_path} does not exist.")
+        print(f"Something went wrong with giving the {original_image_file_path} image rounded corners. Rounded corners skipped.")
+
 
 def get_image_name_with_suffix(filepath: str, image_name: str) -> str:
     if "." in image_name :

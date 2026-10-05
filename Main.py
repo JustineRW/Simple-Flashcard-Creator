@@ -3,10 +3,9 @@ from borb.pdf import (
     Font,
 )
 import pandas as pd
-
 from reference_page import add_reference_pages
 from image_manipulation import give_image_rounded_corners
-from flashcard_creator import create_flashcards
+from botanical_flashcard_creator import create_flashcards
 from image_manipulation import make_images_transparent
 from pdf_transformer import transform_pdf_into_multiple_pages
 
@@ -22,7 +21,7 @@ filepath_original_images = "images/originals/"
 rounded_corners_filepath = "images/originals/cornermask.png"
 one_card_per_page_output_file_name = "one_card_per_page_flashcards"
 cards_per_A4_page = 3
-chosen_transparency = 75 # approx quarter alpha (255 is no transparency at all, 0 is fully transparent)
+chosen_transparency = 125 # approx half alpha (255 is no transparency at all, 0 is fully transparent)
 page_width = 842 #A4 width
 page_height = 595 #A4 height
 

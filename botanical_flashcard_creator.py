@@ -31,13 +31,14 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
     image_border_colour = X11Color.LIGHT_GRAY
     fromPageEdgeToCardOuterEdgeWidth = int((divided_page - image_width)/2)
     fromPageEdgeToCardOuterEdgeHeight = int((page_height - image_height)/2)
-    internal_padding = 23
-    bottom_padding = 7   
+    xy_padding = 23
+    bottom_padding = 10   
     top_padding = 35  
 
     print("Creating cards.")
     
     for index, row in df.iterrows():
+        print(f"Creating card for {str(row['genus'])}")
         current_page: Page = Page(page_height, divided_page)
         document.append_page(current_page)
         layout: PageLayout = SingleColumnLayout(current_page, margin_left=fromPageEdgeToCardOuterEdgeWidth,margin_right=fromPageEdgeToCardOuterEdgeWidth, margin_bottom=fromPageEdgeToCardOuterEdgeHeight, margin_top=fromPageEdgeToCardOuterEdgeHeight)
@@ -49,13 +50,13 @@ def create_flashcards(df: pd.DataFrame, font: Font, italic_font: Font, pageWidth
             table_row_count = table_row_count + 1
 
         layout_table = FixedColumnWidthTable(number_of_columns=1, number_of_rows=table_row_count)
-        layout_table.append_layout_element(add_family_name(internal_padding, font, row, top_padding, bottom_padding, 11))
-        layout_table.append_layout_element(add_species_full_name(internal_padding, font, italic_font, row, 4, 17))
+        layout_table.append_layout_element(add_family_name(xy_padding, font, row, top_padding, bottom_padding, 11))
+        layout_table.append_layout_element(add_species_full_name(xy_padding, font, italic_font, row, 4, 17))
         if isinstance(row['exampleSpecies'],str):
-                layout_table.append_layout_element(add_examples(internal_padding, italic_font, row, 0, 8))       
-        layout_table.append_layout_element(add_common_names(internal_padding, font, row, 9, 12, 13))
-        layout_table.append_layout_element(add_quote(internal_padding, font, row, 0, 8))
-        layout_table.append_layout_element(add_short_reference(internal_padding, font, italic_font, row, 0, 7))
+                layout_table.append_layout_element(add_examples(xy_padding, italic_font, row, 0, 8))       
+        layout_table.append_layout_element(add_common_names(xy_padding, font, row, 9, 12, 13))
+        layout_table.append_layout_element(add_quote(xy_padding, font, row, 2, 7))
+        layout_table.append_layout_element(add_short_reference(xy_padding, font, italic_font, row, 0, 7))
         layout_table.no_borders()
 
         try:
@@ -142,10 +143,20 @@ def add_front_image(row, image_width, image_height, image_border_colour, image_b
     return image        
 
 def add_short_reference(internal_padding, font, italic_font, row, bottom_padding, font_size):
-    quoteAuthorFirstName = Chunk(clean_text(str(row['quoteAuthorFirstName'])) + " ", font_size=font_size, font=font)
-    quoteAuthorLastName = Chunk( clean_text(str(row['quoteAuthorLastName'])), font_size=font_size, font=font)
-    quoteYearPublished = Chunk(" ("+ clean_text(str(row['quoteYearPublished'])) + "), ", font_size=font_size, font=font)
-    quotePublicationTitle = Chunk(clean_text(str(row['quotePublicationTitle'])).title(), font_size=font_size, font=italic_font)
+
+    quoteAuthorFirstName = Chunk("")
+    quoteAuthorLastName = Chunk("")
+    quoteYearPublished = Chunk("")
+    quotePublicationTitle = Chunk("")
+
+    if isinstance(row['quoteAuthorFirstName'], str):
+        quoteAuthorFirstName = Chunk(clean_text(row['quoteAuthorFirstName']) + " ", font_size=font_size, font=font)
+    if isinstance(row['quoteAuthorLastName'], str):
+        quoteAuthorLastName = Chunk( clean_text(row['quoteAuthorLastName']), font_size=font_size, font=font)
+    if isinstance(row['quotePublicationTitle'], str):
+        quotePublicationTitle = Chunk(", " + clean_text(row['quotePublicationTitle']).title(), font_size=font_size, font=italic_font)
+    if isinstance(row['quoteYearPublished'], str):
+        quoteYearPublished = Chunk(" ("+ clean_text(row['quoteYearPublished']) + ") ", font_size=font_size, font=font)
 
     paragraph = HeterogeneousParagraph([quoteAuthorFirstName, quoteAuthorLastName, quoteYearPublished, quotePublicationTitle],
             text_alignment=LayoutElement.TextAlignment.LEFT,
@@ -155,12 +166,15 @@ def add_short_reference(internal_padding, font, italic_font, row, bottom_padding
     
     return paragraph
 
+
 def add_quote(internal_padding, font, row, bottomPadding, font_size):
     # TODO write a function for splitting quotes so that species names are correctly italised
     open_and_closing_quote_mark = Chunk('"', font=font, font_size= font_size)
     quote = clean_text(str(row['quote']))
-    if len(quote) > 800: #truncate if too long
-        quote = quote[:800] + "..."
+    max_quote_length = 900
+
+    if len(quote) > max_quote_length: #truncate if too long
+        quote = quote[:max_quote_length] + "..."
     quote_chunk = Chunk(quote, font=font, font_color=X11Color.BLACK, font_size = font_size)
 
     paragraph = HeterogeneousParagraph([open_and_closing_quote_mark,quote_chunk,open_and_closing_quote_mark],
@@ -172,9 +186,23 @@ def add_quote(internal_padding, font, row, bottomPadding, font_size):
     return paragraph
 
 def add_common_names(internal_padding, font, row, top_padding, bottom_padding, font_size):
-    commonNames = clean_text("".join(list(str(row['commonNames'])))).capitalize()
+
+    if not isinstance(row['commonNames'], str):
+        return Paragraph(text='')
+
+    common_names_list : list = row['commonNames'].split(",")
+    capitalised_common_names_list : list = list()
+    
+    for i in range(0, len(common_names_list)):
+        common_name : str = common_names_list[i].strip()
+        # Capitalise first common name in the list
+        if i == 0:
+            common_name = common_name[0].upper() + common_name[1:]
+        capitalised_common_names_list.append(common_name)
+
+    capitalised_common_names : str = clean_text(", ".join(capitalised_common_names_list))
     paragraph =  Paragraph(
-            commonNames,
+            capitalised_common_names,
             font_color=X11Color.BLACK,
             font=font,
             text_alignment=LayoutElement.TextAlignment.CENTERED,
