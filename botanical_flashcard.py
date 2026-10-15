@@ -1,6 +1,7 @@
 class Botanical_Flashcard:
     def __init__(self, dataframe_row):
-        self.familyNamefamilyExemplar = dataframe_row["familyNamefamilyExemplar"]
+        self.familyName = dataframe_row["familyName"]
+        self.familyExemplar = dataframe_row["familyExemplar"]
         self.genus = dataframe_row["genus"]
         self.species = dataframe_row["species"]
         self.subspecies = dataframe_row["subspecies"]
