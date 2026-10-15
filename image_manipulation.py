@@ -24,7 +24,7 @@ def give_image_rounded_corners(new_filepath, original_filepath, corner_mask_file
             print(f"File {original_image_file_path} does not exist.")
         print(f"Something went wrong with giving the {original_image_file_path} image rounded corners. Rounded corners skipped.")
 
-def add_overlay(new_filepath, original_filepath, overlay_image_filepath : str, image_name: str, alpha : int):
+def add_overlay(new_filepath, original_filepath, overlay_image_filepath : str, image_name, alpha : int):
         
     image_name = get_image_name_with_suffix(original_filepath, image_name)
     original_image_file_path = original_filepath + image_name
@@ -46,10 +46,15 @@ def add_overlay(new_filepath, original_filepath, overlay_image_filepath : str, i
     except:
         if not pathlib.Path(original_image_file_path).exists():
             print(f"File {original_image_file_path} does not exist.")
-        print(f"Something went wrong with giving the {original_image_file_path} image rounded corners. Rounded corners skipped.")
+        print(f"Something went wrong with adding an overlay to the {original_image_file_path} image. Overlay skipped.")
 
 
 def get_image_name_with_suffix(filepath: str, image_name: str) -> str:
+
+    # Prefer png images for the transparency of the overlays
+    if pathlib.Path(filepath + image_name.split('.')[0] + '.png').exists():
+        return image_name.split('.')[0] + '.png'
+
     if "." in image_name :
             return image_name
 

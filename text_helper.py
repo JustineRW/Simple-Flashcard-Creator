@@ -1,9 +1,14 @@
-
 def clean_text(input_string: str):
-    cleaned_input : str = str.replace(input_string,"‘","'").replace("”","\"").strip()
+    cleaned_input: str = (
+        str.replace(input_string, "‘", "'").replace("”", '"').replace("’", "'").strip()
+    )
     return cleaned_input
 
-def get_species_full_name_or_plural(genus : str, species : str):
-    species_name_or_plural = species if species != 'nan' else 'spp.' #NaN species cell indicates we just want to use the genus name
-    full_name = clean_text(genus + ' ' + species_name_or_plural).capitalize()
+
+def get_species_full_name_or_plural(genus: str, species: str):
+    species_name_or_plural = (
+        species if species != "nan" else "spp."
+    )  # NaN species cell indicates we just want to use the genus name
+    
+    full_name = clean_text(genus + " " + species_name_or_plural).capitalize()
     return full_name
